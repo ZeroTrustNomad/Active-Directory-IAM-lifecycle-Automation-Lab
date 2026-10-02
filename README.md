@@ -50,13 +50,63 @@ The primary test identity was `daniel.wilson`.
     └── validated JML evidence
 ```
 
-## Evidence
+## Visual Case Study
 
-The `screenshots` directory is organized as a numbered evidence trail so a reviewer can follow the validated lifecycle controls from the AD structure through Joiner, Mover, Leaver, negative testing, and the final audit log.
+### 1. Active Directory IAM Structure
 
-**Evidence path:** AD structure → security groups → Joiner → duplicate protection → Mover → post-change verification → failure handling → Leaver → post-offboarding verification → repeat protection → audit trail.
+The lab separates users, groups, computers, servers, and service accounts beneath a dedicated `IAMLAB` OU. Department access is represented with Global Security Groups.
 
-See [screenshots/README.md](screenshots/README.md) for the complete 15-image evidence index.
+![IAMLAB Active Directory OU structure](screenshots/01-ad-ou-structure.png)
+
+![Department security groups](screenshots/02-security-groups.png)
+
+### 2. Joiner — Provision Identity and Access
+
+The Joiner workflow created `daniel.wilson` in Finance as a Junior Financial Analyst and assigned `GG-Finance`.
+
+![Successful Joiner provisioning](screenshots/04-joiner-success.png)
+
+A second provisioning request for the same `SamAccountName` was blocked, preventing a duplicate identity.
+
+![Duplicate Joiner request blocked](screenshots/05-joiner-duplicate-blocked.png)
+
+### 3. Mover — Change Role and Remove Previous Access
+
+Before the transfer, Daniel was in Finance with `GG-Finance`. The Mover workflow changed the department to IT, changed the title to IAM Engineer, removed `GG-Finance`, and assigned `GG-IT`.
+
+![Successful Mover workflow](screenshots/07-mover-success.png)
+
+Independent verification confirmed the resulting IT attributes and `GG-IT` membership.
+
+![Mover post-change verification](screenshots/08-mover-after-state.png)
+
+### 4. Defensive Mover Validation
+
+A transfer request to the unmapped department `Legal` was rejected.
+
+![Unmapped department rejected](screenshots/09-mover-failure-logged.png)
+
+Post-failure verification confirmed the account remained IT / IAM Engineer with `GG-IT`, demonstrating that the validation failure did not alter the existing identity/access state.
+
+![Mover failure state verification](screenshots/10-mover-failure-verified.png)
+
+### 5. Leaver — Disable Identity and Remove Access
+
+The Leaver workflow disabled the account and removed non-default group access. Verification showed the account disabled with only the default `Domain Users` membership remaining.
+
+![Leaver post-offboarding verification](screenshots/13-leaver-after-state.png)
+
+A repeated offboarding request was blocked because the identity was already disabled.
+
+![Repeated Leaver request blocked](screenshots/14-leaver-repeat-blocked.png)
+
+### 6. Lifecycle Audit Trail
+
+The consolidated audit trail records the tested lifecycle as `SUCCESS`, `BLOCKED`, and `FAILED` events: initial provisioning, duplicate protection, successful transfer, rejected invalid transfer, successful offboarding, and repeat-offboarding protection.
+
+![Daniel Wilson IAM lifecycle audit trail](screenshots/15-iam-audit-log.png)
+
+For the full 15-image evidence sequence, see [screenshots/README.md](screenshots/README.md).
 
 ## IAM Concepts Practiced
 Identity lifecycle management, department-based access assignment, least privilege, provisioning/deprovisioning, account disablement, entitlement removal, input validation, duplicate-account prevention, defensive error handling, audit logging, and post-change verification.
