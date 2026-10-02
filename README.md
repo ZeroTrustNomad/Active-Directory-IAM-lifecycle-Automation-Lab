@@ -50,6 +50,14 @@ The primary test identity was `daniel.wilson`.
     └── validated JML evidence
 ```
 
+## Evidence
+
+The `screenshots` directory is organized as a numbered evidence trail so a reviewer can follow the validated lifecycle controls from the AD structure through Joiner, Mover, Leaver, negative testing, and the final audit log.
+
+**Evidence path:** AD structure → security groups → Joiner → duplicate protection → Mover → post-change verification → failure handling → Leaver → post-offboarding verification → repeat protection → audit trail.
+
+See [screenshots/README.md](screenshots/README.md) for the complete 15-image evidence index.
+
 ## IAM Concepts Practiced
 Identity lifecycle management, department-based access assignment, least privilege, provisioning/deprovisioning, account disablement, entitlement removal, input validation, duplicate-account prevention, defensive error handling, audit logging, and post-change verification.
 
