@@ -40,8 +40,6 @@ This lab simulates identity lifecycle administration in an Active Directory envi
 
 ## Architecture
 
-![IAM Lab Architecture](diagrams/architecture.png)
-
 *Architecture diagram will be added after the final lab diagram is created.*
 
 The Active Directory structure separates users, groups, computers, servers, and service accounts beneath the `IAMLAB` organizational unit.
@@ -59,9 +57,7 @@ These groups model department-based access entitlements and allow lifecycle auto
 
 ### OU Structure
 
-![Active Directory OU Structure](screenshots/01-ad-ou-structure.png)
-
-*Screenshot placeholder — final evidence image will be added.*
+The lab uses dedicated organizational units beneath `IAMLAB` for users, groups, computers, servers, and service accounts. Additional OU evidence will be added when the lifecycle screenshot set is organized.
 
 ## Joiner Workflow
 
@@ -91,11 +87,9 @@ Verify Identity + Membership
 Write Audit Event
 ```
 
-![Joiner Success](screenshots/03-joiner-success.png)
 
 The workflow also checks for an existing `sAMAccountName` before provisioning. Duplicate identities are blocked rather than modified.
 
-![Duplicate Account Protection](screenshots/04-duplicate-blocked.png)
 
 ## Mover Workflow
 
@@ -122,7 +116,6 @@ Verify + Audit
 
 A tested lifecycle scenario transferred a lab identity from Sales to Human Resources. The previous `GG-Sales` entitlement was removed and `GG-HR` was assigned.
 
-![Mover Success](screenshots/05-mover-success.png)
 
 ### Troubleshooting and Control Improvement
 
@@ -169,7 +162,6 @@ Record Offboarding Status
 Verify + Audit
 ```
 
-![Leaver Success](screenshots/06-leaver-success.png)
 
 A second attempt to offboard an already-disabled account is detected and blocked, preventing unnecessary repeated changes.
 
@@ -179,7 +171,6 @@ Lifecycle operations are written to `C:\IAMLAB\Logs\Provisioning.log`. Audit rec
 
 The lab has produced **SUCCESS**, **FAILED**, and **BLOCKED** events, allowing both successful operations and control failures to be reviewed.
 
-![IAM Audit Log](screenshots/07-audit-log.png)
 
 ## IAM Controls Demonstrated
 
