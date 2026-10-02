@@ -40,7 +40,9 @@ This lab simulates identity lifecycle administration in an Active Directory envi
 
 ## Architecture
 
-*Architecture diagram will be added after the final lab diagram is created.*
+The diagram below shows the completed on-premises lab architecture and the relationship between the virtualization layer, Active Directory, PowerShell lifecycle automation, RBAC security groups, the domain-joined workstation, and protected resources.
+
+![Active Directory IAM Lab Architecture](diagrams/01-iam-lab-architecture.png)
 
 The Active Directory structure separates users, groups, computers, servers, and service accounts beneath the `IAMLAB` organizational unit.
 
