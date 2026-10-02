@@ -189,19 +189,79 @@ The lab has produced **SUCCESS**, **FAILED**, and **BLOCKED** events, allowing b
 
 ## RBAC and Access-Control Validation
 
-The lab also validates lifecycle changes against protected resources from the domain-joined `WIN11-01` workstation. HR and IT SMB resources are authorized through the `GG-HR` and `GG-IT` security groups.
+This end-to-end validation connects Active Directory identity lifecycle changes to actual authentication and authorization outcomes on a domain-joined Windows 11 workstation.
 
-A tested HR-to-IT Mover scenario demonstrates that previous HR access is revoked and new IT access is granted after the identity's role changes. A Leaver scenario then disables the account, removes non-default access, and prevents a new domain logon.
+### 01 — Domain Join: Computer Object Created
+`WIN11-01` was joined to `iam.local`, creating its computer object in Active Directory.
 
-![HR authorized access](screenshots/rbac-access-control/04-hr-authorized-access.png)
+![01 - WIN11 domain join](screenshots/rbac-access-control/01-win11-domain-join-default-container.png)
 
-![Post-Mover HR access revoked](screenshots/rbac-access-control/08-post-mover-hr-access-revoked.png)
+### 02 — Managed OU Placement
+The workstation object was moved into the lab's managed computer OU beneath `IAMLAB`.
 
-![Post-Mover IT access granted](screenshots/rbac-access-control/10-post-mover-it-access-granted.png)
+![02 - WIN11 computer OU placement](screenshots/rbac-access-control/02-win11-computer-ou-placement.png)
 
-![Leaver login blocked](screenshots/rbac-access-control/13-leaver-login-blocked.png)
+### 03 — Domain User Authentication
+John Smith authenticated to the domain-joined workstation as `iamlab\john.smith`, establishing the identity context used for access testing.
 
-**[View the complete RBAC and identity lifecycle access-control case study](docs/access-control.md)**
+![03 - Domain user authentication](screenshots/rbac-access-control/03-domain-user-authentication.png)
+
+### 04 — HR Access Granted
+As an HR identity with `GG-HR` membership, John successfully accessed and read the protected HR resource.
+
+![04 - HR authorized access](screenshots/rbac-access-control/04-hr-authorized-access.png)
+
+### 05 — Unauthorized HR Access Denied
+Sarah Johnson, assigned to Finance through `GG-Finance` and without `GG-HR`, was denied access to the HR resource.
+
+![05 - HR unauthorized access denied](screenshots/rbac-access-control/05-hr-unauthorized-access-denied.png)
+
+### 06 — Pre-Mover Identity State
+Before the role change, John was an enabled HR Specialist with `GG-HR` membership.
+
+![06 - Mover before state](screenshots/rbac-access-control/06-mover-before-state.png)
+
+### 07 — Mover: HR to IT
+The Mover workflow changed John's department and title, removed `GG-HR`, and assigned `GG-IT`.
+
+![07 - Mover HR to IT success](screenshots/rbac-access-control/07-mover-hr-to-it-success.png)
+
+### 08 — Previous HR Access Revoked
+After the role change and refreshed sign-in context, John no longer had HR authorization and the protected HR resource was denied.
+
+![08 - Post-Mover HR access revoked](screenshots/rbac-access-control/08-post-mover-hr-access-revoked.png)
+
+### 09 — IT Resource Authorization
+The protected IT resource was configured with SMB and NTFS authorization for the `GG-IT` security group.
+
+![09 - IT resource access control](screenshots/rbac-access-control/09-it-resource-access-control.png)
+
+### 10 — New IT Access Granted
+With `GG-IT` in his refreshed logon token, John successfully accessed and read the protected IT resource.
+
+![10 - Post-Mover IT access granted](screenshots/rbac-access-control/10-post-mover-it-access-granted.png)
+
+### 11 — Pre-Leaver Identity State
+Immediately before offboarding, John remained an enabled IT identity with `GG-IT` membership.
+
+![11 - Pre-Leaver identity state](screenshots/rbac-access-control/11-pre-leaver-identity-state.png)
+
+### 12 — Leaver Deprovisioning
+The Leaver workflow disabled John's account and removed `GG-IT`, leaving only the default `Domain Users` membership.
+
+![12 - Leaver offboarding success](screenshots/rbac-access-control/12-leaver-offboarding-success.png)
+
+### 13 — Authentication Blocked
+After sign-out, a new Windows logon attempt was rejected because the domain account was disabled.
+
+![13 - Leaver login blocked](screenshots/rbac-access-control/13-leaver-login-blocked.png)
+
+### 14 — Lifecycle Audit Trail
+The provisioning log records the successful Mover and Leaver events, providing timestamped evidence of the lifecycle changes.
+
+![14 - John lifecycle audit trail](screenshots/rbac-access-control/14-john-lifecycle-audit-trail.png)
+
+**[View the detailed RBAC and identity lifecycle access-control case study](docs/access-control.md)**
 
 ## Automation Scripts
 
