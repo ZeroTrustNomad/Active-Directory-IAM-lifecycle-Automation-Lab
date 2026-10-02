@@ -20,6 +20,10 @@ This lab simulates identity lifecycle administration in an Active Directory envi
 - Repeated-offboarding protection
 - SUCCESS / FAILED / BLOCKED audit events
 - PowerShell error handling and validation
+- Role-based access control (RBAC) validation
+- Protected SMB resource authorization
+- Access revocation after role changes
+- Authentication blocking after offboarding
 
 ## Lab Environment
 
@@ -192,9 +196,25 @@ The lab has produced **SUCCESS**, **FAILED**, and **BLOCKED** events, allowing b
 | Error Handling | Failed operations are surfaced and logged |
 | Verification | Identity attributes and group membership checked after changes |
 
+## RBAC and Access-Control Validation
+
+The lab also validates lifecycle changes against protected resources from the domain-joined `WIN11-01` workstation. HR and IT SMB resources are authorized through the `GG-HR` and `GG-IT` security groups.
+
+A tested HR-to-IT Mover scenario demonstrates that previous HR access is revoked and new IT access is granted after the identity's role changes. A Leaver scenario then disables the account, removes non-default access, and prevents a new domain logon.
+
+![HR authorized access](screenshots/rbac-access-control/04-hr-authorized-access.png)
+
+![Post-Mover HR access revoked](screenshots/rbac-access-control/08-post-mover-hr-access-revoked.png)
+
+![Post-Mover IT access granted](screenshots/rbac-access-control/10-post-mover-it-access-granted.png)
+
+![Leaver login blocked](screenshots/rbac-access-control/13-leaver-login-blocked.png)
+
+**[View the complete RBAC and identity lifecycle access-control case study](docs/access-control.md)**
+
 ## Automation Scripts
 
-The final tested versions of the PowerShell scripts will be published in the `scripts/` directory after they are exported from the lab server.
+Tested PowerShell lifecycle scripts are maintained in the `scripts/` directory.
 
 | Script | Purpose |
 | --- | --- |
@@ -204,11 +224,11 @@ The final tested versions of the PowerShell scripts will be published in the `sc
 
 ## Evidence
 
-Final screenshots will be stored in `screenshots/` and will show the AD structure, departmental groups, successful lifecycle operations, defensive controls, and audit trail.
+RBAC and lifecycle validation evidence is organized under `screenshots/rbac-access-control/`. The detailed walkthrough in `docs/access-control.md` connects each screenshot to the IAM control being tested.
 
 ## Next Phase
 
-The next phase will extend the lab toward hybrid identity, including a Windows client, Microsoft Entra ID synchronization, and additional cloud identity controls. These components are not presented as completed until they have been built and tested.
+The next phase will extend the completed on-premises lab toward hybrid identity with Microsoft Entra ID synchronization and additional cloud identity controls. Cloud components are not presented as completed until they have been built and tested.
 
 ## Disclaimer
 
