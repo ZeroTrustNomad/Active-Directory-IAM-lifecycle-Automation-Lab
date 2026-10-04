@@ -2,11 +2,11 @@
 
 Hands-on Identity and Access Management lab demonstrating automated **Joiner, Mover, and Leaver (JML)** lifecycle operations using Windows Server Active Directory and PowerShell.
 
-> **Status:** On-premises Active Directory JML automation completed. Hybrid identity / Microsoft Entra ID integration is planned as a later phase.
+> **Status:** On-premises JML automation, RBAC validation, and Microsoft Entra hybrid identity synchronization completed and tested.
 
 ## Project Overview
 
-This lab simulates identity lifecycle administration in an Active Directory environment. The project focuses on repeatable identity operations, department-based access assignment, least-privilege access changes, deprovisioning, defensive controls, and audit logging.
+This lab simulates identity lifecycle administration across on-premises Active Directory and Microsoft Entra ID. It combines repeatable JML operations, department-based access assignment, least-privilege access changes, deprovisioning, audit logging, and controlled hybrid identity synchronization.
 
 ### IAM capabilities demonstrated
 
@@ -24,6 +24,12 @@ This lab simulates identity lifecycle administration in an Active Directory envi
 - Protected SMB resource authorization
 - Access revocation after role changes
 - Authentication blocking after offboarding
+- Dedicated Microsoft Entra Connect Sync server
+- Least-privilege Hybrid Identity Administrator role
+- OU-scoped directory synchronization
+- Password Hash Synchronization (PHS)
+- Synchronized-user and cloud-authentication verification
+- Hybrid Mover attribute propagation from AD to Entra ID
 
 ## Lab Environment
 
@@ -37,10 +43,14 @@ This lab simulates identity lifecycle administration in an Active Directory envi
 | DNS | Windows Server DNS |
 | Automation | PowerShell |
 | Lab OU | `IAMLAB` |
+| Sync Server | `SYNC-01` (`172.16.147.15`) |
+| Cloud Directory | Microsoft Entra ID Free |
+| Hybrid Sync | Microsoft Entra Connect Sync |
+| Authentication Sync | Password Hash Synchronization |
 
 ## Architecture
 
-The diagram below shows the completed on-premises lab architecture and the relationship between the virtualization layer, Active Directory, PowerShell lifecycle automation, RBAC security groups, the domain-joined workstation, and protected resources.
+The diagram below shows the original on-premises architecture. The lab was subsequently extended with a dedicated `SYNC-01` server and Microsoft Entra Connect Sync; the validated hybrid phase is documented separately below.
 
 ![Active Directory IAM Lab Architecture](diagrams/01-iam-lab-architecture.png)
 
@@ -59,7 +69,7 @@ These groups model department-based access entitlements and allow lifecycle auto
 
 ### OU Structure
 
-The lab uses dedicated organizational units beneath `IAMLAB` for users, groups, computers, servers, and service accounts. Additional OU evidence will be added when the lifecycle screenshot set is organized.
+The lab uses dedicated organizational units beneath `IAMLAB` for users, groups, computers, servers, and service accounts. A dedicated `Synced Users` OU was later added so hybrid synchronization could be limited to intentionally selected identities rather than the full directory.
 
 ## Joiner Workflow
 
@@ -188,6 +198,10 @@ The lab has produced **SUCCESS**, **FAILED**, and **BLOCKED** events, allowing b
 | Auditability | Timestamped SUCCESS / FAILED / BLOCKED records |
 | Error Handling | Failed operations are surfaced and logged |
 | Verification | Identity attributes and group membership checked after changes |
+| Hybrid Identity Scope | Only identities in `IAMLAB\\Synced Users` are selected for synchronization |
+| Hybrid Authentication | Password Hash Synchronization from AD to Entra ID |
+| Cloud Least Privilege | Dedicated Hybrid Identity Administrator used for Entra Connect configuration |
+| Hybrid Mover | Department/title changes verified from AD through Entra Connect into Entra ID |
 
 ## RBAC and Access-Control Validation
 
@@ -265,6 +279,62 @@ The provisioning log records the successful Mover and Leaver events, providing t
 
 **[View the detailed RBAC and identity lifecycle access-control case study](docs/access-control.md)**
 
+## Hybrid Identity — Microsoft Entra ID
+
+The completed hybrid phase extends the same `iam.local` environment into Microsoft Entra ID using a dedicated domain-joined synchronization server. The implementation was intentionally scoped to a small pilot population so disabled and unrelated lab identities were not synchronized.
+
+### Hybrid design and controls
+
+- `SYNC-01` is a dedicated Windows Server member server placed in the managed Servers OU.
+- Active Directory remains the authoritative source for synchronized test identities.
+- Cloud-ready UPNs were assigned to the selected active users.
+- A dedicated cloud-only **Hybrid Identity Administrator** account was used instead of Global Administrator for Entra Connect configuration.
+- Microsoft Entra Connect Sync was configured with **Password Hash Synchronization**.
+- Synchronization scope was restricted to `IAMLAB → Synced Users`.
+- Michael Davis and Sarah Johnson were used as the controlled pilot identities.
+- Successful import, synchronization, export, synchronized-object state, cloud authentication, and password-change synchronization were verified.
+- A hybrid Mover test changed Sarah Johnson from **Finance / Financial Analyst** to **IT / IT Support Analyst** in Active Directory and verified the resulting attributes in Entra ID.
+
+### Evidence highlights
+
+**Controlled synchronization scope**
+
+![Hybrid OU filtering](screenshots/hybrid-identity/09-domain-ou-filtering-scoped-sync.png)
+
+**Password Hash Synchronization enabled**
+
+![Password Hash Synchronization](screenshots/hybrid-identity/10-password-hash-synchronization-enabled.png)
+
+**Entra Connect configuration completed**
+
+![Entra Connect configuration complete](screenshots/hybrid-identity/12-entra-connect-configuration-complete.png)
+
+**Synchronized identity verified in Entra ID**
+
+![Synchronized user verification](screenshots/hybrid-identity/13-synchronized-user-verification.png)
+
+**Synchronization engine operations completed successfully**
+
+![Synchronization engine operations](screenshots/hybrid-identity/14-sync-engine-successful-operations.png)
+
+**Cloud authentication validated with synchronized credentials**
+
+![Password hash sync authentication](screenshots/hybrid-identity/15-password-hash-sync-authentication-success.png)
+
+**Password-change synchronization recorded successfully**
+
+![Password change synchronization](screenshots/hybrid-identity/16-password-change-directory-sync-success.png)
+
+**Hybrid Mover — authoritative AD change**
+
+![Hybrid Mover on-premises change](screenshots/hybrid-identity/17-hybrid-mover-onprem-attribute-change.png)
+
+**Hybrid Mover — Entra ID reflects the new attributes**
+
+![Hybrid Mover cloud synchronization](screenshots/hybrid-identity/18-hybrid-mover-cloud-attribute-sync.png)
+
+**[View the complete hybrid identity case study and all 18 evidence screenshots](docs/hybrid-identity.md)**
+
 ## Automation Scripts
 
 Tested PowerShell lifecycle scripts are maintained in the `scripts/` directory.
@@ -277,11 +347,11 @@ Tested PowerShell lifecycle scripts are maintained in the `scripts/` directory.
 
 ## Evidence
 
-RBAC and lifecycle validation evidence is organized under `screenshots/rbac-access-control/`. The detailed walkthrough in `docs/access-control.md` connects each screenshot to the IAM control being tested.
+Evidence is separated by control domain: `screenshots/rbac-access-control/` contains on-premises RBAC/JML validation, while `screenshots/hybrid-identity/` contains Microsoft Entra hybrid synchronization evidence. Detailed walkthroughs are maintained in `docs/access-control.md` and `docs/hybrid-identity.md`.
 
 ## Next Phase
 
-The next phase will extend the completed on-premises lab toward hybrid identity with Microsoft Entra ID synchronization and additional cloud identity controls. Cloud components are not presented as completed until they have been built and tested.
+Future phases can extend the validated hybrid foundation into additional identity controls such as group synchronization, device identity, SSO/federation, MFA/Conditional Access where licensing permits, and Okta integration. These are not presented as completed until they are built and tested.
 
 ## Disclaimer
 
